@@ -43,4 +43,11 @@
   跳出率：只浏览一页便离开
   退出率：在某页离开占总浏览比例，通常用于购物网站从浏览商品到付款的整个过程的优化
   用户停留时间：网站质量
+九、注意点
+  带nofollow属性的url不会传递权值
+  百度基本不会抓取https协议的网站，建议做个http访问的版本
+  要防止所有搜索引擎显示自己的网站的快照，将此元标记置入网页的<head>部分：<meta name="robots" content="noarchive">
+  如果不想搜索引擎追踪此网页的链接，且不传递链接的权重，将此元标记置入：<meta name="robots" content="nofollow">
+十、联系反馈
+  投诉反馈中心：http://tousu.baidu.com/webmaster/add/#2
   
