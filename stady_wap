@@ -185,5 +185,34 @@
                 如果有条件的话，最好能根据屏幕的不同大小，加载不同分辨率的图片。
           三、自适应站点对百度友好的关键  
             1. applicable-device标注应该怎么写
-                
+              有了自适应设计的网页，还要照顾到对百度友好的设计，即告诉百度“我是自适应页面”方便百度进行识别校验。方法也很简单，只要在上面viewport标签下面再添加一个applicable-device标签就行：
+              表示页面同时适合在移动设备和PC上进行浏览。
+            2. 在使用百度站长平台链接提交工具的sitemp进行提交时，要做mobile type标记，具体取值：
+              <mobile:mobile type="pc,mobile"/>
+              其他网页取值如下：
+              <mobile:mobile/> ：移动网页
+              <mobile:mobile type="mobile"/> ：移动网页
+              <mobile:mobile type="htmladapt"/>：代码适配
+              无该上述标签表示为PC网页    
+      代码适配如何做对百度友好
+        百度的移动适配目前分为三种情况：跳转适配，代码适配和自适应。跳转适配目前百度的站长平台里有完整的适配工具，可以在平台里提交适配规则即可。但是代码适配则需要我们在网站里做一些配置，才能让百度准确识别我们的网页适配关系。
+      流量潜力
+        如果不做移动适配的话，可能我们本来有的移动网页和移动端排名因百度无法确认是移动页面，因此这部分流量都给指向了百度的转码页。可以看自己网站在站长工具里面，移动端有多少流量是指向了转码页。这部分流量在做完适配后，即可指向我们的移动页面，避免了自己的流量被百度截流。
+      开发
+        代码适配的开发，百度官方也有详细的说明，可分为两部分： Vary HTTP标头 和 Meta applicable-device 标签。
+        【Vary HTTP 标头】
+          其作用在百度的文档里解释得很清楚：1、它会向百度传递一个信号，表示说这是个代码适配的站点，百度就会尽快把网站抓取一遍进行适配；2、它可以防止用户接收到错误的网页缓存。这部分是在网站的服务器上进行的，有可能是 Nginx,Apache, IIS 等， 需要在服务器的配置里，设置 Varyheader 为 Vary:Accept-Encoding, User-Agent
+          比如Nginx 下， 可以在配置文件中加上：more_set_headers-s 200 "Vary: " "Accept-Encoding, User-Agent"
+          注意：打开这个设置需要nginx同时安装有ngx_headers_more模块
+          在Apache下，可以在配置文件里写上：Headerappend Vary User-Agent
+        【Meta applicable-device 标签】
+          这部分是在网站的模板里添加的。自适应的网站肯定已经有了判断用户设备是 PC 还是 Mobile 的逻辑。利用这个逻辑，在整站的 <head></head> 部分添加一行代码即可：
+          如果用户是PC设备(注意需要包括Baiduspider PC UA)，则添加<metaname="applicable-device" content="pc">
+          如果用户是移动设备(包括 Baiduspider Mobile UA)，则添加<metaname="applicable-device" content="mobile">
+          注：关于BAIDUSPIDER，移动和PC其实都是Baiduspider，并没有区分，只是UA进行了区分。最新移动UA请见百度官方文档。
+      验收上线
+        开发完成后，需要先在测试机上验收。可以用 Google 浏览器来模拟 Baiduspider 来检查是否添加正确, 如图所示, 是检查 Baiduspider Mobile UA 的效果的
+        在测试机上验收完成后就可以上线了。上线后，尽量再用站长平台的抓取诊断工具测试几个页面，以免到线上后出现与测试机不一致的情况。比如下面是抓取 PC 页面来检查的线上结果。
+      跟踪
+        上线后就可以持续跟踪百度移动的SEO流量数据了。要追踪的主要是网站自己的统计工具统计的流量数据和百度站长平台的移动端转码页流量数据。上线后一到两周，移动端的流量应该就会有明显的增长，而百度转码页的流量则会下降。这个此消彼长的过程会持续一段时间。直到转码页的流量基本为0，都转为移动页的流量。
 https://www.0dayhack.com/sort/1
