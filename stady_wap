@@ -80,6 +80,110 @@
      五、移动类型提交 
       百度站在平台的设置里，把网站分为了五类：PC站；有对应PC站的移动站；独立移动站；自适应的站点；代码适配的站点。
       根据站点实际情况进行设置，有利于百度蜘蛛在抓取页面，以及搜索结果的排名（PC站和M站的搜索结果展现机制不一样）
-      
-      
+        更多注意事项
+          允许Baiduspider访问，不要robots封禁 虽然听起来有些无厘头，但这种情况是真实存在的，要注意你的移动站点对百度是不是开放的。
+            1.UA判断后尽量使用301或302进行跳转 现在比较常见的是PC站点只适配一个移动站点，那么使用301就可以，如果需要同时适配高端域名和低端域名，推荐使用302
+            2.尽量为页面添加applicable-device标签 applicable-device标签用于帮助百度校验识别页面类型的准确度，虽然不是硬性要求，但对站点来说没有任何弊端
+            3.如果是PC页，在<head></head>中标注<meta name="applicable-device"content="pc"> 如果是移动页，在<head></head>中标注<meta name="applicable-device"content="mobile">
+            4.移动适配工具、META标签、自主适配——三种方式逻辑关系保持一致 很多朋友都是这三种方式全用的，百度也支持这样，但这里有一个问题是：逻辑关系要保持不致，不能在自主适配时PC页对应的是移动页是A，而提交时却变成了B。这样最终百度自主选择的适配移动页面可能和你预期的不一样。
+        通过百度站长工具提交适配关系的注意事项
+          规则适配中正则粒度越细越好 提交多条规则就涉及到正则式的问题，正则匹配符号(\d+)表述数字，([a-zA-Z]+) 表示字母，([a-zA-Z0-9]+)表示字母混合，(\w+)表示字母数字下划线混合，上述四种匹配符号中，前两者属于粒度最细的、推荐使用，第三种第四种粒度较粗，在正则式中若用大粒度匹配符将会增加校验时间。
+          案例：若有两个PC页面www.123.com/a/abc-1.html和www.123.com/a/def-1.html，有些站长会直接用 www.123.com/a/(\w+).html 对应 m.123.com/a/${1}.html 一个正则表达。但建议写成两个正则：
+          www.123.com/a/abc-(\d+).html对应 m.123.com/a/abc-${1}.html  
+          www.123.com/a/def-(\d+).html对应 m.123.com/a/def-${1}.html
+        自适应对百度友好关键
+          二、自适应网页代码上需要做出哪些调整
+            1.阻止移动浏览器自动调整页面大小
+              iOS和Android浏览器都基于webkit核心，这两种浏览器以及其他的很多浏览器都支持viewport meta元素覆盖默认的画布缩放设置，只需在HTML的<head>标签中插入一个<meta>标签，<meta>标签中可以设置具体的宽度(如像素值)或者缩放比例2.0(设备实际尺寸的两倍)，下面是将一个页面放大到设备实际尺寸两倍显示的meta标签示例:
+              <meta name=”viewport” content=”initial-scale=2.0,width=device-width”/>
+            2.将网页修改为百分比布局 
+              当某个浏览窗口处于媒体查询固定的范围之外，网页就需要水平滚动才能完整浏览，而通过百分比布局可以页面元素根据窗口大小在一个又一个媒体查询之间灵活修正样式，具体来讲，就是css代码不会指定具体像素宽度：width:xxx px;而是会指定一个百分比宽度：width:xx%;或者直接就是width:auto;这里大家可以根据一个简易的公式将固定像素宽度转换成对应的百分比宽度：目标元素宽度 ÷ 上下文元素宽度 = 百分比宽度 例如：
+                <div id ="wraper">
+                <divid = "header"></div>
+                </div>
+                #wrapper {
+                margin-right: auto;
+                margin-left: auto;
+                width: 960px;
+                }
+                #header {
+                margin-right: 10px;
+                margin-left:10px;
+                width: 940px;
+                }
+                转换为百分比的header区块的css为：
+                #header {
+                margin-right: 10px;
+                margin-left: 10px;
+                width: 97.916667% /* 940 ÷ 960 */
+                }
+            3.用em替换px   
+              同样，目标元素宽度 ÷ 上下文元素宽度 = 百分比宽度这个公式也适用于将文字的像素单位转换为相对单位，值得注意的是，现代浏览器的默认文字都是16像素，因此一开始给body标签应用下列任何一条规则所产生的效果都一样:
+                font-size: 100%;
+                font-size:16px;
+                font-size: 1em;
+                例如某网站网站标题相应的样式:
+                #logo {
+                   display: block;
+                   padding-top: 75px;
+                   color: #0d0c0c;
+                   font-family: Arial;
+                   font-size: 48px;
+                }
+                修改后的样式如下:
+                #logo{
+                   display: block;
+                   padding-top: 75px;
+                   color: #0d0c0c;
+                   font-family:Arial;
+                   font-size:3em /* 48 ÷ 16 */
+                }
+              4.流动布局（fluid grid）的使用
+                “流动布局”指的是各个区块的位置都浮动，不是固定不变的。
+                .main {float: right;width: 70%;}
+                .leftBar {float: left;width: 25%;}
+                这么做的好处是，如果宽度太小，放不下两个元素，后面的元素会自动滚动到前面元素的下方，不会在水平方向溢出，避免了水平滚动条的出现，大大提升了用户的阅读体验。另外，绝对定位（position:absolute）的使用，也要非常小心。
+              5.Media Query技术的使用
+                在自适应设计的技术中，css3支持css2.1定义的媒体类型，同时添加了很多涉及媒体类型的功能属性，包括max-width(最大宽度)，device-width(设备宽度，orientation(屏幕定向:横屏或竖屏)，因此可以通过Media Query加载相应的CSS文件。例如，下面代码定义了如果页面通过屏幕呈现，并且屏幕宽度不超过480px,则加载shetland.css
+                <link rel="stylesheet" 
+                      type="text/css"
+                      media="screen and (max-device-width: 480px)"　
+                      href="shetland.css" />
+                同样可以创建多个样式表，以适应不同设备或者不同分辨率的宽度范围，当然更有效的做法是将多个Media Query整合在一个样式表文件中:
+
+                @media only screen and (min-devece-width: 320px) and (max-device-width: 480px) {
+                   /* Styles */
+                } 
+                @media screen and (min-width: 600px) {
+                .hereIsMyClass {
+                  width: 30%;
+                  float: right;
+                }
+                上面的代码中定义的样式类只有在浏览器屏幕宽度超过600px时才会有效。
+                Media Query不是唯一的解决方案，同样可以通过Javascript来实现自适应设计，特别是某些旧浏览器无法完美支持CSS3的Media Query时，它可以作为备选方案。当然，我们仍然能借助专业的Javascript库来帮助旧浏览器(IE5+,Firefox 1+,Safari 2等)支持CSS3的Media Queries.使用方法:下载css3-mediaqueries.js,然后在页面中调用它即可，例如:
+                <!--[if lt IE 9]>
+                  <script src=http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js></script>
+                <![endif]-->
+              6.设计响应式图片
+                有很多同比缩放图片的技术，其中有不少是简单易行的，比较流行的方法是使用CSS的max-width属性：
+                img { 
+                    max-width: 100%;
+                }
+                老版本的IE不支持max-width，所以只好写成：
+                img { 
+                    width: 100%; 
+                }
+                此外，windows平台缩放图片时，可能出现图像失真现象。这时，可以尝试使用IE的专有命令：
+                img { 
+                    -ms-interpolation-mode: bicubic; 
+                }
+                或者Ethan Marcotte的imgSizer.js
+                addLoadEvent(function() {
+                    var imgs = ocument.getElementById("content").getElementsByTagName("img");
+                    imgSizer.collate(imgs);
+                });
+                如果有条件的话，最好能根据屏幕的不同大小，加载不同分辨率的图片。
+          三、自适应站点对百度友好的关键  
+            1. applicable-device标注应该怎么写
+                
 https://www.0dayhack.com/sort/1
